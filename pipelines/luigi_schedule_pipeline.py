@@ -1,7 +1,4 @@
 import luigi
-import requests
-import psycopg2
-from bs4 import BeautifulSoup
 
 from helpers.data_exporter import DataExporter
 from scrapers.schedule_scraping import SJSUScraper
@@ -16,7 +13,6 @@ class scrape_and_process_data(luigi.Task):
 
     def output(self):
         return luigi.LocalTarget('data/{self.term}_course_schedule')
-
 
     def run(self):
         scraper = SJSUScraper(self.url)
