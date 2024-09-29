@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-class CourseEntry(BaseModel):
+class CourseScheduleEntry(BaseModel):
     term: None
     department: str
     course: str
