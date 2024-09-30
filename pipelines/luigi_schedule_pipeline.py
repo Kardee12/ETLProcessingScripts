@@ -12,7 +12,7 @@ class scrape_and_process_data(luigi.Task):
     term = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget('data/{self.term}_course_schedule')
+        return luigi.LocalTarget(f'data/{self.term}_course_schedule.csv')
 
     def run(self):
         scraper = SJSUScraper(self.url)

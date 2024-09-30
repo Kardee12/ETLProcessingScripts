@@ -12,11 +12,9 @@ class DataExporter:
             json.dump(data, file)
 
     @staticmethod
-    def to_csv(data, filename):
+    def to_csv(data, file_obj):
         fieldnames = list(data[0].keys())
-        with open(filename, 'w', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-            for entry in data:
-                writer.writerow(entry)
-
+        writer = csv.DictWriter(file_obj, fieldnames=fieldnames)
+        writer.writeheader()
+        for entry in data:
+            writer.writerow(entry)
