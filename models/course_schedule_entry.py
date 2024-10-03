@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+
+
 class CourseScheduleEntry(BaseModel):
     term: None
     department: str

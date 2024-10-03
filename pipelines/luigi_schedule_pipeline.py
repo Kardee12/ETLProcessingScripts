@@ -1,10 +1,16 @@
 import luigi
 
-from helpers.data_exporter import DataExporter
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from scrapers.schedule_scraping import SJSUScraper
+from scrapers.course_scraping import scrapeCourses
+from helpers.data_exporter import DataExporter
 
 
-class scrape_and_process_data(luigi.Task):
+class ScheduleProcessor(luigi.Task):
     """
     Task to scrape and process the scheduled data and process it and save it to database
     """
@@ -23,3 +29,28 @@ class scrape_and_process_data(luigi.Task):
         jsonData = exporter.to_json(class_schedule_data)
         with self.output().open('w') as output_file:
             exporter.to_csv(jsonData, output_file)
+
+
+class CourseProcessor(luigi.Task):
+    """
+    Task to scrape and process the scheduled data and process it and save it to database
+    """
+    departments = luigi.Parameter()
+    term = luigi.Parameter()
+
+    def output(self):
+        return luigi.LocalTarget(f'data/{self.term}_courses.csv')
+
+    def run(self):
+        courses, departments = scrapeCourses(self.departments)
+
+        exporter = DataExporter()
+
+        coursesJson = exporter.to_json(courses)
+
+        with self.output().open('w') as output_file:
+            exporter.to_csv(coursesJson, output_file)
+
+
+if __name__ == '__main__':
+    luigi.build([CourseProcessor(departments=["AAS", "COMM"], term="2024_2025")], local_scheduler=True)

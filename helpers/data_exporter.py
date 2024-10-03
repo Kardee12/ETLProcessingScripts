@@ -1,6 +1,7 @@
 import csv
 import json
 
+
 class DataExporter:
     @staticmethod
     def to_json(data):

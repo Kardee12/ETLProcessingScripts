@@ -24,7 +24,6 @@ class SJSUScraper:
             columns = row.find_all("td")
 
             department, course, section = columns[0].text.strip().split(" ", 2)
-            print(section)
             section = re.findall(r"[a-zA-Z0-9]+", section)[0]
             class_number = columns[1].text.strip()
             mode_of_instruction = columns[2].text.strip()
@@ -41,7 +40,6 @@ class SJSUScraper:
                 instructorEmail = instructorEmail.replace("mailto:", "")
             else:
                 instructorEmail = ""
-            print((instructorEmail))
             location = columns[10].text.strip()
             dates = columns[11].text.strip()
             open_seats = int(float(columns[12].text.strip()))
@@ -70,3 +68,4 @@ class SJSUScraper:
             schedule_data.append(entry)
 
         return schedule_data
+
