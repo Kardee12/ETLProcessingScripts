@@ -5,7 +5,9 @@ from models.course_schedule_entry import CourseScheduleEntry
 
 
 class SJSUScraper:
-    def __init__(self, url):
+    def __init__(self, url, term, year):
+        self.term = term
+        self.year = year
         self.url = url
 
     def getHTML(self):
@@ -23,8 +25,11 @@ class SJSUScraper:
                 continue
             columns = row.find_all("td")
 
+            # AAS 1 (Section 11)
             department, course, section = columns[0].text.strip().split(" ", 2)
-            section = re.findall(r"[a-zA-Z0-9]+", section)[0]
+
+            match = re.search(r'Section (\d+)', section)
+            section = str(match.group(1)) if match else None
             class_number = columns[1].text.strip()
             mode_of_instruction = columns[2].text.strip()
             course_title = columns[3].text.strip()
@@ -46,10 +51,11 @@ class SJSUScraper:
             notes = columns[13].text.strip()
 
             entry = CourseScheduleEntry(
-                term=None,
+                term=self.term,
+                year=self.year,
                 department=department,
                 course=course,
-                section=section,
+                section=str(section),
                 class_number=class_number,
                 mode_of_instruction=mode_of_instruction,
                 course_title=course_title,
