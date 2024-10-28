@@ -90,7 +90,7 @@ def scrapeCourses(prefixes):
     driver = initializeDriver()
     for tag in prefixes:
         driver.get(
-            f'https://catalog.sjsu.edu/content.php?filter[27]={tag}&filter[29]=&filter[keyword]=&filter[32]=1&filter[cpage]=1&cur_cat_oid=14&expand=&navoid=5106&search_database=Filter&filter[exact_match]=1#acalog_template_course_filter')
+            f'https://catalog.sjsu.edu/content.php?filter[27]={tag}&filter[29]=&filter[keyword]=&filter[32]=1&filter[cpage]=1&cur_cat_oid=15&expand=&navoid=5382&search_database=Filter&filter[exact_match]=1#acalog_template_course_filter')
         deptName = findDeptName(driver)
 
         department_entry = DepartmentEntry(
@@ -102,10 +102,11 @@ def scrapeCourses(prefixes):
         getClassesData(driver, courses)
 
         try:
-            # sometimes the page has a page 2...
-            driver.find_element(By.CSS_SELECTOR, '[aria-label="Page 2"]').click()
-            findDeptName(driver)
-            getClassesData(driver, courses)
+            # process a maximum of 5 pages
+            for i in range(2, 6):
+                driver.find_element(By.CSS_SELECTOR, f"[aria-label=\"Page {i}\"]").click()
+                findDeptName(driver)
+                getClassesData(driver, courses)
         except:
             continue
 

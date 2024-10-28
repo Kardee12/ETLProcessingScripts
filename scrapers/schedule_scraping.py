@@ -40,11 +40,10 @@ class SJSUScraper:
             times = columns[8].text.strip()
             instructor = columns[9].text
             email_link_tag = columns[9].find('a')
+            instructorEmail = ""
             if email_link_tag and email_link_tag.has_attr('href'):
                 instructorEmail = email_link_tag['href']
                 instructorEmail = instructorEmail.replace("mailto:", "")
-            else:
-                instructorEmail = ""
             location = columns[10].text.strip()
             dates = columns[11].text.strip()
             open_seats = int(float(columns[12].text.strip()))
