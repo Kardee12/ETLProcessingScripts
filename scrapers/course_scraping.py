@@ -11,9 +11,13 @@ from models.course_entry import DepartmentEntry
 
 def initializeDriver():
     options = webdriver.ChromeOptions()
-    prefs = {"profile.default_content_setting_values.notifications": 2}
-    options.add_experimental_option("prefs", prefs)
-    service = Service(ChromeDriverManager().install())
+    # prefs = {"profile.default_content_setting_values.notifications": 2}
+    # options.add_experimental_option("prefs", prefs)
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    path = ChromeDriverManager().install()
+    service = Service(path)
     return webdriver.Chrome(service=service, options=options)
 
 
