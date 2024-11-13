@@ -3,3 +3,4 @@ pipelines/data
 .DS_Store
 __pycache__/
 .env
+scrapers/users_rows.csv

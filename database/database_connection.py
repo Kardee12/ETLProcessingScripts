@@ -3,6 +3,9 @@ import datetime
 import psycopg2
 from datetime import date
 
+from matplotlib.backend_bases import cursors
+
+
 class DatabaseConnection:
 
     connection = None
@@ -60,7 +63,7 @@ class DatabaseConnection:
                         f"OR courses.satisfies_area IS DISTINCT FROM EXCLUDED.satisfies_area "\
                         f"OR courses.department IS DISTINCT FROM EXCLUDED.department;"
                 cursor.execute(query)
-            except psycopg2.errors.ForeignKeyViolation as e:
+            except psycopg2.errors.Error as e:
                 self.connection.rollback()
                 print(f"Error inserting course ({course.course}): \n" + str(e))
 
@@ -90,7 +93,7 @@ class DatabaseConnection:
                         f"OR users.is_professor IS DISTINCT FROM EXCLUDED.is_professor;"
 
                 cursor.execute(query, (prof_id, current_date, professor, professors[professor], True))
-            except psycopg2.errors.ForeignKeyViolation as e:
+            except psycopg2.errors.Error as e:
                 self.connection.rollback()
                 print(f"Error inserting user ({id}): \n" + str(e))
 
@@ -155,13 +158,73 @@ class DatabaseConnection:
                             f"OR schedules.professor_id IS DISTINCT FROM EXCLUDED.professor_id " \
                             f"OR schedules.department IS DISTINCT FROM EXCLUDED.department;"
                     cursor.execute(query, (schedule.term, schedule.year, schedule.class_number, schedule.course, schedule.section, schedule.days, schedule.dates, schedule.times, schedule.class_type, schedule.units, schedule.location, schedule.mode_of_instruction, schedule.satisfies, professor_id, schedule.department))
-                except psycopg2.errors.ForeignKeyViolation as e:
+                except psycopg2.errors.Error as e:
                     self.connection.rollback()
                     print(f"Error inserting class ({schedule.class_number}): \n" + str(e))
 
             self.connection.commit()
 
         cursor.close()
+
+    def update_reviews(self, reviews):
+        cursor = self.connection.cursor()
+
+        valid_tags = self.__get_valid_enum("tag_enum")
+        valid_grades = self.__get_valid_enum("grade_enum")
+        for review in reviews:
+            try:
+                cleaned_tags = [tag.strip() for tag in review.tags if tag.strip() in valid_tags]
+                review.grade = review.grade if review.grade in valid_grades else None
+                query = f"INSERT INTO reviews (created_at, updated_at, user_id, professor_id, course_number, department, content, quality, ease, grade, tags, take_again, is_user_anonymous)" \
+                        f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::tag_enum[], %s, %s) ON CONFLICT (id) " \
+                        f"DO UPDATE SET " \
+                        f"created_at = EXCLUDED.created_at, " \
+                        f"updated_at = EXCLUDED.updated_at," \
+                        f"user_id = EXCLUDED.user_id," \
+                        f"professor_id = EXCLUDED.professor_id," \
+                        f"course_number = EXCLUDED.course_number," \
+                        f"department = EXCLUDED.department, " \
+                        f"content = EXCLUDED.content, " \
+                        f"quality = EXCLUDED.quality, " \
+                        f"ease = EXCLUDED.ease, " \
+                        f"grade = EXCLUDED.grade, " \
+                        f"tags = EXCLUDED.tags, " \
+                        f"take_again = EXCLUDED.take_again, " \
+                        f"is_user_anonymous = EXCLUDED.is_user_anonymous " \
+                        f"WHERE reviews.created_at IS DISTINCT FROM EXCLUDED.created_at " \
+                        f"OR reviews.updated_at IS DISTINCT FROM EXCLUDED.updated_at " \
+                        f"OR reviews.user_id IS DISTINCT FROM EXCLUDED.user_id " \
+                        f"OR reviews.professor_id IS DISTINCT FROM EXCLUDED.professor_id " \
+                        f"OR reviews.course_number IS DISTINCT FROM EXCLUDED.course_number " \
+                        f"OR reviews.department IS DISTINCT FROM EXCLUDED.department " \
+                        f"OR reviews.content IS DISTINCT FROM EXCLUDED.content " \
+                        f"OR reviews.quality IS DISTINCT FROM EXCLUDED.quality " \
+                        f"OR reviews.ease IS DISTINCT FROM EXCLUDED.ease " \
+                        f"OR reviews.grade IS DISTINCT FROM EXCLUDED.grade " \
+                        f"OR reviews.tags IS DISTINCT FROM EXCLUDED.tags " \
+                        f"OR reviews.take_again IS DISTINCT FROM EXCLUDED.take_again " \
+                        f"OR reviews.is_user_anonymous IS DISTINCT FROM EXCLUDED.is_user_anonymous;"
+                cursor.execute(query, (review.created_at, review.updated_at, review.user_id, review.professor_id, review.course_number, review.department, review.content, review.quality, review.ease, review.grade, cleaned_tags, review.take_again, review.is_user_anonymous))
+            except psycopg2.errors.Error as e:
+                self.connection.rollback()
+                print(f"Error inserting review: \n" + str(e))
+
+        self.connection.commit()
+        cursor.close()
+
+    def __get_valid_enum(self, enum_name):
+        cursor = self.connection.cursor()
+        try:
+            query = f"SELECT unnest(enum_range(NULL::{enum_name}));"
+            cursor.execute(query)
+            enum_values = [row[0] for row in cursor.fetchall()]
+            cursor.close()
+            return enum_values
+        except psycopg2.errors.Error as e:
+            print(f"Error querying available enum values: \n" + str(e))
+        cursor.close()
+        return []
+            
 
     def close_database(self):
         self.connection.close()
