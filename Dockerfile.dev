@@ -1,0 +1,13 @@
+FROM python:3.12
+
+WORKDIR /app
+
+# install requirements
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy contents
+COPY . .
+
+# Start the pipeline
+CMD ["python3", "/app/pipelines/luigi_schedule_pipeline.py"]

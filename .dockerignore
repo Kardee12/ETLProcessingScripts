@@ -1,0 +1,7 @@
+.env
+**/__pycache__/
+docker-compose.dev.yml
+docker-compose.prod.yml
+Dockerfile.dev
+Dockerfile.prod
+README.md

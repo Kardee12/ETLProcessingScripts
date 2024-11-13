@@ -2,17 +2,14 @@ import luigi
 
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from dotenv import load_dotenv
 
-from scrapers.schedule_scraping import SJSUScraper
-from scrapers.course_scraping import scrapeCourses
-from scrapers.professor_scraping import scrape_professor_emails
 from scrapers.review_scraping import scrape_reviews
 
 from database.database_connection import DatabaseConnection
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 load_dotenv()
 
 class DatabaseUpdater(luigi.Task):
@@ -26,11 +23,11 @@ class DatabaseUpdater(luigi.Task):
 
     def run(self):
         # database details
-        database = os.getenv("DATABASE")
-        host = os.getenv("HOST")
-        user = os.getenv("USER")
-        password = os.getenv("PASSWORD")
-        port = os.getenv("PORT")
+        database = os.getenv("DB_DATABASE")
+        host = os.getenv("DB_HOST")
+        user = os.getenv("DB_USER")
+        password = os.getenv("DB_PASSWORD")
+        port = os.getenv("DB_PORT")
 
         db_conn = DatabaseConnection()
         db_conn.connect_to_db(database, host, user, password, port)

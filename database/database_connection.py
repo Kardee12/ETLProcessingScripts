@@ -3,8 +3,6 @@ import datetime
 import psycopg2
 from datetime import date
 
-from matplotlib.backend_bases import cursors
-
 
 class DatabaseConnection:
 
