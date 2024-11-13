@@ -7,7 +7,7 @@ from models.course_schedule_entry import CourseScheduleEntry
 class SJSUScraper:
     def __init__(self, url, term, year):
         self.term = term
-        self.year = year
+        self.year = int(year)
         self.url = url
 
     def getHTML(self):

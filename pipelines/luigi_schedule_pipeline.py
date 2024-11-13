@@ -59,4 +59,4 @@ class DatabaseUpdater(luigi.Task):
         db_conn.close_database()
 
 if __name__ == '__main__':
-    luigi.build([DatabaseUpdater(departments=["MUSC"], url="https://www.sjsu.edu/classes/schedules/fall-2024.php", term="Fall", year=2024)], local_scheduler=True)
+    luigi.build([DatabaseUpdater(departments=["MUSC", "MATH"], url="https://www.sjsu.edu/classes/schedules/fall-2024.php", term="Fall", year="2024")], local_scheduler=True)

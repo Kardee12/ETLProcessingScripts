@@ -2,6 +2,8 @@ from scrapers.ratemyprofessor import *
 
 from models.review_entry import ReviewEntry
 
+from datetime import datetime
+
 import csv
 import re
 
@@ -17,7 +19,8 @@ def scrape_reviews():
                 ratings = professor.get_ratings()
                 for rating in ratings:
                     year = rating.date.year
-                    if year >= 2015:
+                    current_year = datetime.now().year
+                    if year >= current_year - 1:
                         class_name = rating.class_name
                         department, course_number = None, None
                         if "-" in class_name:
