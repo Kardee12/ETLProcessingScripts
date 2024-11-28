@@ -1,9 +1,9 @@
 import os
 import re
 import requests
-import pandas as pd
 from bs4 import BeautifulSoup
 from luigi.notifications import email
+import csv
 
 
 def scrape_professor_emails(instructor_list):
@@ -57,5 +57,12 @@ def scrape_professor_emails(instructor_list):
 
     for x in email_map:
         print(x + ": " + email_map[x])
+    
+    # write to csv file
+    f = open(os.path.join(os.path.dirname(__file__), "users_rows.csv"), "w")
+    writer = csv.DictWriter(f, fieldnames=["name", "email"])
+    writer.writeheader()
+    for x in email_map:
+        writer.writerow({"name":x, "email":email_map[x]})
 
     return email_map

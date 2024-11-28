@@ -1,0 +1,12 @@
+name: etl-dev
+services:
+  etlscripts:
+    build:
+      dockerfile: Dockerfile.dev
+    environment:
+      - DB_HOST=${DB_HOST?REQUIRED}
+      - DB_PORT=${DB_PORT?REQUIRED}
+      - DB_USER=${DB_USER?REQUIRED}
+      - DB_PASSWORD=${DB_PASSWORD?REQUIRED}
+      - DB_DATABASE=${DB_DATABASE?REQUIRED}
+    network_mode: host

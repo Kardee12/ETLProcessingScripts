@@ -4,13 +4,14 @@ from models.review_entry import ReviewEntry
 
 from datetime import datetime
 
+import os
 import csv
 import re
 
 def scrape_reviews():
     reviews = []
 
-    with open("../scrapers/users_rows.csv") as prof_rows:
+    with open(os.path.join(os.path.dirname(__file__), "users_rows.csv")) as prof_rows:
         reader = csv.DictReader(prof_rows)
         for row in reader:
             professor = get_professor_by_school_and_name(

@@ -1,0 +1,17 @@
+FROM python:3.12-alpine
+
+WORKDIR /app
+
+# install requirements
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy contents
+COPY . .
+
+# Setup crontab to run every 1 minute
+RUN echo "*/1 * * * * python3 /app/pipelines/luigi_schedule_pipeline.py" >> /app/crontab
+RUN crontab /app/crontab 
+
+# Run the command on container startup
+CMD ["crond", "-f"]

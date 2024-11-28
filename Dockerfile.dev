@@ -1,0 +1,21 @@
+FROM python:3.12
+
+WORKDIR /app
+
+# install requirements for chrome driver
+RUN apt update \
+    && apt install --no-install-recommends -y libnss3  wget
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+RUN apt clean
+
+# install requirements
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy contents
+COPY . .
+
+# Start the pipeline
+CMD ["python3", "/app/pipelines/luigi_schedule_pipeline.py"]
+# CMD ["sleep", "infinity"]
